@@ -3,9 +3,10 @@ const path = require('path');
 
 //// ///// //// ///////// ///// //// ///// CREATE NEW FOLDER
 const projectPath = path.join(__dirname, 'project-dist');
+
 async function createFolder(projectPath) {
   try {
-    await fsPromises.mkdir(projectPath);
+    await fsPromises.mkdir(projectPath, { recursive: true });
   } catch (err) {
     console.error(`Error when creating a folder: ${err}`);
   }
@@ -44,3 +45,25 @@ async function readFiles(stylesPath) {
 }
 
 readFiles(stylesPath);
+
+//// ///// //// ///////// ///// //// ///// COPY ASSETS
+const startPath = path.join(__dirname, 'assets');
+const newPath = path.join(__dirname, 'project-dist', 'assets');
+
+async function copyDirectory(source, destination) {
+  await fsPromises.mkdir(destination, { recursive: true });
+  const entries = await fsPromises.readdir(source, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(source, entry.name);
+    const destPath = path.join(destination, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDirectory(srcPath, destPath);
+    } else {
+      await fsPromises.copyFile(srcPath, destPath);
+    }
+  }
+}
+
+copyDirectory(startPath, newPath);

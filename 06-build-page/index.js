@@ -17,7 +17,7 @@ createFolder(projectPath);
 //// ///// //// ///////// ///// //// ///// CREATE SINGLE STYLES FILE
 
 const stylesPath = path.join(__dirname, 'styles');
-const bundlePath = path.join(__dirname, 'project-dist', 'styles.css');
+const bundlePath = path.join(__dirname, 'project-dist', 'style.css');
 
 let data = [];
 
@@ -67,3 +67,40 @@ async function copyDirectory(source, destination) {
 }
 
 copyDirectory(startPath, newPath);
+
+//// ///// //// ///////// ///// //// ///// CREATE HTML LAYOUT
+const sourceTemplatePath = path.join(__dirname, 'template.html');
+const outputIndexPath = path.join(__dirname, 'project-dist', 'index.html');
+
+async function createLayout() {
+  try {
+    let templateSourceFile = await fsPromises.readFile(
+      sourceTemplatePath,
+      'utf8',
+    );
+    const regex = /{{(\w+)}}/g;
+    let match;
+
+    while ((match = regex.exec(templateSourceFile)) !== null) {
+      const placeholder = match[0];
+      const fileName = match[1];
+      const filePath = path.join(__dirname, 'components', fileName + '.html');
+
+      try {
+        const fileContent = await fsPromises.readFile(filePath, 'utf8');
+        templateSourceFile = templateSourceFile.replace(
+          placeholder,
+          fileContent,
+        );
+      } catch (error) {
+        console.error(`Error reading file ${fileName}:`, error);
+      }
+    }
+
+    await fsPromises.writeFile(outputIndexPath, templateSourceFile, 'utf8');
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+createLayout();

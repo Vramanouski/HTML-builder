@@ -37,11 +37,9 @@ async function readFiles(stylesPath) {
 
   fsPromises
     .writeFile(bundlePath, data, 'utf8')
-    .then(() => {
-      console.log('You styles have been merged. Enjoy!');
-    })
+    .then(() => {})
     .catch((e) => {
-      console.error('Error:', err);
+      console.error('Error when mixing styles:', err);
     });
 }
 

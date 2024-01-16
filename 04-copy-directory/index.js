@@ -15,7 +15,7 @@ async function copyFiles() {
       await fsPromises.copyFile(sourceFile, destFile);
     }
   } catch (error) {
-    console.error('Error during file copy:', error);
+    console.error('Error:', error);
   }
 }
 
